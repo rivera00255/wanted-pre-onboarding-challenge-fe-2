@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import authState from "../recoils/auth";
 
 const Header = () => {
@@ -10,12 +10,26 @@ const Header = () => {
 
   const loginUser = useRecoilValue(authState);
   // console.log(loginUser);
+  const setLoginUser = useSetRecoilState(authState);
 
   return (
     <MainHeader>
       <nav>
         <h1>Todos</h1>
-        {loginUser.token || location.pathname === "/auth" ? null : (
+        {loginUser.token || location.pathname === "/auth" ? (
+          loginUser.token ? (
+            <div>
+              <p>{loginUser.email}</p>
+              <button
+                onClick={() => {
+                  setLoginUser({});
+                }}
+              >
+                로그아웃
+              </button>
+            </div>
+          ) : null
+        ) : (
           <button onClick={() => navigate("/auth")}>로그인</button>
         )}
       </nav>
@@ -36,12 +50,29 @@ const MainHeader = styled.header`
       font-size: 20px;
       font-weight: 700;
     }
-    > button {
+    button {
       font-size: 14px;
       background: #757575;
       color: #fff;
       padding: 4px 32px;
       border-radius: 5px;
+      &:hover {
+        background: #616161;
+      }
+    }
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      > p {
+        font-size: 14px;
+        color: #757575;
+        margin-right: 10px;
+      }
+      > button {
+        padding: 1px 10px;
+        font-weight: 200;
+      }
     }
   }
 `;

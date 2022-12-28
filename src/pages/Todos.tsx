@@ -3,14 +3,27 @@ import axios from "axios";
 import React, { useRef } from "react";
 import styled from "styled-components";
 import { baseUrl } from "./Auth";
+import { useRecoilValue } from "recoil";
+import authState from "../recoils/auth";
+import instance from "../utilities/api";
 
 const Todos = () => {
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLInputElement>(null);
+  const loginUser = useRecoilValue(authState);
 
   const { mutate: createTodo } = useMutation(
-    ({ title, content }: { title: string; content: string }) => {
-      return axios.post(`${baseUrl}/todos`, { title, content });
+    async ({ title, content }: { title: string; content: string }) => {
+      const response = await axios.post(
+        `${baseUrl}/todos`,
+        {
+          title,
+          content,
+        },
+        { headers: { Authorization: loginUser.token } }
+      );
+      console.log(response);
+      return response;
     }
   );
 
@@ -22,15 +35,10 @@ const Todos = () => {
         <Button
           onClick={() => {
             if (titleRef.current && contentRef.current) {
-              try {
-                const response = createTodo({
-                  title: titleRef.current.value,
-                  content: contentRef.current.value,
-                });
-                console.log(response);
-              } catch (e) {
-                console.log(e);
-              }
+              createTodo({
+                title: titleRef.current.value,
+                content: contentRef.current.value,
+              });
             }
           }}
         >

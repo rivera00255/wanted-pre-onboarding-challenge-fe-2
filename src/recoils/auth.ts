@@ -8,10 +8,18 @@ export type LoginUser = {
 const authState = atom({
   key: "authState",
   default: {} as LoginUser,
-});
+  effects: [
+    ({ setSelf, onSet }: any) => {
+      const savedUser = localStorage.getItem("user");
+      savedUser !== null && setSelf(JSON.parse(savedUser));
 
-export const authSelector = {
-  key: "authState",
-};
+      onSet((user: LoginUser) => {
+        user.token !== ""
+          ? localStorage.setItem("user", JSON.stringify(user))
+          : localStorage.removeItem("user");
+      });
+    },
+  ],
+});
 
 export default authState;
