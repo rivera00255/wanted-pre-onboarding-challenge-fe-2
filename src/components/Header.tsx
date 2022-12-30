@@ -22,7 +22,7 @@ const Header = () => {
               <p>{loginUser.email}</p>
               <button
                 onClick={() => {
-                  setLoginUser({});
+                  setLoginUser({ email: "", token: "" });
                 }}
               >
                 로그아웃

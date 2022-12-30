@@ -1,50 +1,99 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { baseUrl } from "./Auth";
 import { useRecoilValue } from "recoil";
 import authState from "../recoils/auth";
-import instance from "../utilities/api";
+import api from "../utilities/api";
+import TodoItem, { Todo } from "../components/TodoItem";
 
 const Todos = () => {
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLInputElement>(null);
+
+  const queryClient = useQueryClient();
+
   const loginUser = useRecoilValue(authState);
 
+  const [enable, setEnable] = useState(false);
+
+  const { data: todos } = useQuery(
+    ["todo"],
+    () => {
+      return axios.get(`${baseUrl}/todos`, {
+        headers: { Authorization: loginUser.token },
+      });
+    },
+    { enabled: enable }
+  );
+
+  const todoList = useMemo(() => todos?.data.data, [todos]);
+  // console.log(todoList);
+
   const { mutate: createTodo } = useMutation(
-    async ({ title, content }: { title: string; content: string }) => {
-      const response = await axios.post(
-        `${baseUrl}/todos`,
-        {
+    ({ title, content }: { title: string; content: string }) => {
+      // const response = await axios.post(
+      //   `${baseUrl}/todos`,
+      //   {
+      //     title,
+      //     content,
+      //   },
+      //   { headers: { Authorization: loginUser.token } }
+      // );
+      // console.log(response);
+      // return response;
+      return api
+        .post(`${baseUrl}/todos`, {
           title,
           content,
-        },
-        { headers: { Authorization: loginUser.token } }
-      );
-      console.log(response);
-      return response;
-    }
+        })
+        .catch((e) => console.log(e));
+    },
+    { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todo"] }) }
   );
+
+  useEffect(() => {
+    loginUser.token && loginUser.token !== "" && setEnable(true);
+  }, [loginUser.token]);
 
   return (
     <Container>
-      <InnerContainer>
-        <input type="text" placeholder="제목을 입력하세요." ref={titleRef} />
-        <input type="text" placeholder="할 일을 입력하세요." ref={contentRef} />
-        <Button
-          onClick={() => {
-            if (titleRef.current && contentRef.current) {
-              createTodo({
-                title: titleRef.current.value,
-                content: contentRef.current.value,
-              });
-            }
-          }}
-        >
-          추가
-        </Button>
-      </InnerContainer>
+      {loginUser.token === "" ? (
+        <InnerContainer>로그인해주세요.</InnerContainer>
+      ) : (
+        <>
+          <InnerContainer>
+            <input
+              type="text"
+              placeholder="제목을 입력하세요."
+              ref={titleRef}
+            />
+            <input
+              type="text"
+              placeholder="할 일을 입력하세요."
+              ref={contentRef}
+            />
+            <Button
+              onClick={() => {
+                if (titleRef.current && contentRef.current) {
+                  createTodo({
+                    title: titleRef.current.value,
+                    content: contentRef.current.value,
+                  });
+                }
+              }}
+            >
+              추가
+            </Button>
+          </InnerContainer>
+          <InnerContainer>
+            {todoList?.map((item: Todo) => (
+              <TodoItem key={item.id} todo={item} />
+            ))}
+          </InnerContainer>
+        </>
+      )}
     </Container>
   );
 };
@@ -61,6 +110,7 @@ const InnerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
   > input {
     border-bottom: 1px solid #bdbdbd;
     padding: 4px;

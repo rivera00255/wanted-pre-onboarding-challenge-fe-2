@@ -7,7 +7,7 @@ export type LoginUser = {
 
 const authState = atom({
   key: "authState",
-  default: {} as LoginUser,
+  default: { email: "", token: "" } as LoginUser,
   effects: [
     ({ setSelf, onSet }: any) => {
       const savedUser = localStorage.getItem("user");
