@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import authState from "../recoils/auth";
@@ -15,7 +15,9 @@ const Header = () => {
   return (
     <MainHeader>
       <nav>
-        <h1>Todos</h1>
+        <Link to="/">
+          <h1>Todos</h1>
+        </Link>
         {loginUser.token || location.pathname === "/auth" ? (
           loginUser.token ? (
             <div>
@@ -45,8 +47,11 @@ const MainHeader = styled.header`
     width: 1020px;
     margin: 0 auto;
     text-align: center;
-    > h1 {
+    > a {
+      display: block;
       margin: 10px 0;
+    }
+    > h1 {
       font-size: 20px;
       font-weight: 700;
     }

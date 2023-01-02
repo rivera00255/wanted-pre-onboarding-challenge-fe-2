@@ -6,11 +6,12 @@ import { baseUrl } from "./Auth";
 import { useRecoilValue } from "recoil";
 import authState from "../recoils/auth";
 import api from "../utilities/api";
-import TodoItem, { Todo } from "../components/TodoItem";
+import TodoListItem, { Todo } from "../components/todo/TodoListItem";
+import { Link } from "react-router-dom";
 
 const Todos = () => {
   const titleRef = useRef<HTMLInputElement>(null);
-  const contentRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   const queryClient = useQueryClient();
 
@@ -69,18 +70,21 @@ const Todos = () => {
               placeholder="제목을 입력하세요."
               ref={titleRef}
             />
-            <input
-              type="text"
-              placeholder="할 일을 입력하세요."
-              ref={contentRef}
-            />
+            <textarea placeholder="할 일을 입력하세요." ref={contentRef} />
             <Button
               onClick={() => {
                 if (titleRef.current && contentRef.current) {
-                  createTodo({
-                    title: titleRef.current.value,
-                    content: contentRef.current.value,
-                  });
+                  if (
+                    titleRef.current.value === "" ||
+                    contentRef.current.value === ""
+                  ) {
+                    alert("내용을 입력해주세요.");
+                  } else {
+                    createTodo({
+                      title: titleRef.current.value,
+                      content: contentRef.current.value,
+                    });
+                  }
                 }
               }}
             >
@@ -88,9 +92,12 @@ const Todos = () => {
             </Button>
           </InnerContainer>
           <InnerContainer>
-            {todoList?.map((item: Todo) => (
-              <TodoItem key={item.id} todo={item} />
-            ))}
+            {todoList?.length > 0 &&
+              todoList.map((item: Todo) => (
+                <Link to={`/${item.id}`} key={item.id}>
+                  <TodoListItem key={item.id} todo={item} />
+                </Link>
+              ))}
           </InnerContainer>
         </>
       )}
@@ -114,7 +121,7 @@ const InnerContainer = styled.div`
   > input {
     border-bottom: 1px solid #bdbdbd;
     padding: 4px;
-    margin: 8px 0 4px 0;
+    margin: 8px 0;
     width: 480px;
     font-size: 15px;
     &::placeholder {
@@ -125,8 +132,16 @@ const InnerContainer = styled.div`
       outline: none;
     }
   }
-  > input:last-of-type {
-    border-bottom: 2px solid #bdbdbd;
+  > textarea {
+    width: 480px;
+    padding: 4px;
+    border: 1px solid #bdbdbd;
+    resize: none;
+    border-radius: 5px;
+    &::placeholder {
+      font-size: 14px;
+      color: #bdbdbd;
+    }
   }
 `;
 
