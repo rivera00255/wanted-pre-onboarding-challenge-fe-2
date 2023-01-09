@@ -29,7 +29,7 @@ const Auth = () => {
       const response: any = await axios.post(`${baseUrl}/users/create`, user);
       // console.log(response?.data);
       if (response.data.token) {
-        alert(response.data.message);
+        alert(`${response.data.message}. 로그인 후 이용해주세요.`);
       }
     } catch (e: any) {
       if (e.response.data.details === "이미 존재하는 유저입니다") {

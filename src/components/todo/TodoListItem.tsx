@@ -14,6 +14,7 @@ const TodoListItem = ({ todo }: { todo: Todo }) => {
       <p>
         <strong>{todo.title}</strong>
       </p>
+      <p>{todo.content}</p>
       <p>{new Date(todo.createdAt).toLocaleDateString()}</p>
     </ItemWrapper>
   );
@@ -30,12 +31,19 @@ const ItemWrapper = styled.div`
   position: relative;
   margin-bottom: 16px;
   > p {
-    font-size: 12px;
-    color: #bdbdbd;
+    font-size: 14px;
+    color: #757575;
     > strong {
       font-size: 15px;
       font-weight: 500;
       color: #757575;
+    }
+    &:nth-of-type(2) {
+      margin: 8px 0;
+    }
+    &:last-of-type {
+      font-size: 12px;
+      color: #bdbdbd;
     }
   }
   &:hover {

@@ -84,6 +84,8 @@ const Todos = () => {
                       title: titleRef.current.value,
                       content: contentRef.current.value,
                     });
+                    titleRef.current.value = "";
+                    contentRef.current.value = "";
                   }
                 }
               }}
